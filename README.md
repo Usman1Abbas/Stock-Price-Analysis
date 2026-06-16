@@ -1,95 +1,101 @@
-# Stock-Price-Analyis
+<p align="center">
+  <img src="assets/banner.svg" alt="Stock Price Analyzer — Interactive technical analysis of stock prices" width="100%">
+</p>
 
+<h1 align="center">Stock Price Analyzer</h1>
 
-This Streamlit application provides a user-friendly interface to retrieve, analyze, and visualize historical stock price data for basic technical analysis. It leverages the `yfinance` library to fetch data from Yahoo Finance, Pandas for data manipulation, and Matplotlib/Seaborn for plotting within an interactive Streamlit web app.
+<p align="center"><em>An interactive Streamlit app to fetch, chart, and compare historical stock prices with moving averages.</em></p>
 
-## Overview
+<p align="center">
+  <img alt="status" src="https://img.shields.io/badge/status-MVP%20working-1b9c85">
+  <img alt="python" src="https://img.shields.io/badge/python-3.x-0d1b2a">
+  <img alt="streamlit" src="https://img.shields.io/badge/UI-Streamlit-125a4d">
+  <img alt="data" src="https://img.shields.io/badge/data-yfinance%20%C2%B7%20pandas-e9c46a">
+  <img alt="plots" src="https://img.shields.io/badge/plots-matplotlib%20%C2%B7%20seaborn-1b9c85">
+</p>
 
-The primary goal of this application is to offer an easy way for users interested in basic stock market analysis or data science enthusiasts to:
+**Stock Price Analyzer** is a single-file **Streamlit** web app for basic technical analysis of equities. It pulls historical price data straight from Yahoo Finance via **`yfinance`**, computes indicators with **`pandas`**, and renders the charts with **`matplotlib`** and **`seaborn`** — all driven from an interactive sidebar with no code changes required.
 
-*   Fetch historical stock price data for one or two specified tickers.
-*   Define a custom date range for the analysis.
-*   Calculate and visualize key indicators like Closing Price and Moving Averages (Simple Moving Averages - SMA).
-*   Optionally visualize daily simple returns.
-*   Explore potential short-term trends using a simple visual indicator (difference between short-term and long-term SMAs).
-*   Interact with the analysis parameters through a clean web interface.
+> Type a ticker, pick a date range, and read the trend — technical analysis without leaving the browser.
+
+---
 
 ## ✨ Features
 
-*   Interactive UI: Built with Streamlit for easy input and navigation.
-*   Ticker Input: Analyze data for one or two stock tickers simultaneously.
-*   Custom Date Range: Select start and end dates for historical data retrieval.
-*   Moving Average Calculation: Computes configurable short-term and long-term Simple Moving Averages (SMA).
-*   Visualization:
-    *   Plots the closing stock price over time.
-    *   Overlays calculated SMAs on the price chart.
-    *   Optional plot for daily simple returns (`pct_change`).
-    *   Optional exploratory short-term trend visualization (based on 7-day MA difference).
-*   Data Source: Fetches reliable data from Yahoo Finance using the `yfinance` library.
-*   Caching: Uses Streamlit's caching to improve performance by avoiding redundant data downloads.
+- **Interactive UI** — every parameter lives in a Streamlit sidebar; the main view updates live.
+- **One or two tickers** — analyze a single stock or compare two side by side (e.g. `AAPL, MSFT`).
+- **Custom date range** — pick start and end dates (defaults to the last two years).
+- **Configurable moving averages** — short and long Simple Moving Average (SMA) windows you set yourself.
+- **Price + SMA chart** — closing price (`Adj Close`, falling back to `Close`) overlaid with both SMAs.
+- **Optional daily simple returns** — `pct_change` plotted as a toggleable subplot.
+- **Optional exploratory trend** — last 7 trading days of the short-minus-long SMA difference as green/red bars.
+- **Caching** — `@st.cache_data` avoids re-downloading and re-computing on every interaction.
 
+## 🏗️ Pipeline
 
-The application features a sidebar for configuration (tickers, dates, MA windows, plot options) and a main area displaying the generated plots and data insights.
+```
+ Sidebar inputs (tickers, dates, MA windows, toggles)
+        │
+        ▼
+ fetch_stock_data()      ──►  yfinance.download() from Yahoo Finance  (cached 1h)
+        │                     picks 'Adj Close', falls back to 'Close'
+        ▼
+ calculate_indicators()  ──►  short SMA, long SMA, simple returns      (cached)
+        │
+        ▼
+ create_plots()          ──►  matplotlib/seaborn figures per ticker
+        │                     price+SMA · returns · trend bars
+        ▼
+ Streamlit main area     ──►  charts + processed-data preview
+```
 
-## 🛠️ Tech Stack
+## 🚀 Run it
 
-*   **Language:** Python 3.x
-*   **Web Framework:** Streamlit
-*   **Data Handling:** Pandas
-*   **Data Retrieval:** yfinance
-*   **Plotting:** Matplotlib, Seaborn
+```bash
+# 1. Create and activate a virtual environment
+python -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
 
-## ⚙️ Installation
+# 2. Install dependencies
+pip install streamlit yfinance pandas matplotlib seaborn
 
-1.    download `stock_app.py`.*
+# 3. Launch the app
+streamlit run main.py
+```
 
-2.  **Create a virtual environment (Recommended):**
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-    ```
-
-3.  **Install the required libraries:**
-    ```bash
-    pip install streamlit yfinance pandas matplotlib seaborn
-    ```
-    *(Consider creating a `requirements.txt` file for easier dependency management)*
-
-## ▶️ Usage
-
-1.  **Navigate to the directory containing `stock_app.py` in your terminal.**
-
-2.  **Run the Streamlit application:**
-    ```bash
-    streamlit run stock_app.py
-    ```
-
-3.  **Interact with the App:**
-    *   The application will open in your default web browser.
-    *   Use the sidebar on the left to:
-        *   Enter one or two stock tickers (comma-separated, e.g., `AAPL, GOOGL`).
-        *   Select the desired start and end dates.
-        *   Adjust the window lengths for the short-term and long-term moving averages.
-        *   Toggle optional plots (Daily Returns, Exploratory Trend).
-    *   The main area will automatically update to display the analysis results and plots based on your selections.
+The app opens in your browser. Use the sidebar to enter tickers, set the date range and SMA windows, and toggle the optional returns / trend plots.
 
 ## 🔧 Configuration
 
-All primary configuration options (tickers, date range, MA windows, plot visibility) are handled interactively through the Streamlit sidebar widgets within the running application. No code modification is needed for typical use.
+All settings are controlled live from the Streamlit sidebar — no code edits needed:
 
-## 🚀 Future Considerations
+| Control | Description | Default |
+| --- | --- | --- |
+| Tickers | One or two comma-separated symbols (max 2) | `AAPL, MSFT` |
+| Date range | Start / end dates | last 2 years → today |
+| Short MA window | Days for the short SMA | `20` |
+| Long MA window | Days for the long SMA | `50` |
+| Daily Simple Returns | Toggle the returns subplot | off |
+| Exploratory Trend | Toggle the 7-day MA-diff bars | on |
 
-Based on the original requirements, potential future enhancements include:
+## 📊 Output
 
-*   Implementing more advanced technical indicators (e.g., RSI, MACD, Bollinger Bands).
-*   Adding more interactive features to the plots (e.g., zooming, tooltips using libraries like Plotly).
-*   Implementing basic time series forecasting models.
-*   Adding functionality to save the generated plots or analysis data.
-*   Expanding ticker support or comparison features.
+- A price chart per ticker with short and long SMAs overlaid.
+- An optional daily simple-returns plot.
+- An optional 7-day exploratory trend bar chart (short SMA − long SMA), colored green for positive and red for negative.
+- An expandable table previewing the most recent processed data rows.
 
+## 🗺️ Roadmap
+
+Ideas for future iterations:
+
+- More technical indicators (RSI, MACD, Bollinger Bands).
+- Interactive charts with zoom/tooltips (e.g. Plotly).
+- Basic time-series forecasting.
+- Exporting plots and analysis data.
+- A `requirements.txt` for reproducible installs.
 
 ## 🙏 Acknowledgements
 
-*   Data sourced from **Yahoo Finance**.
-*   Data retrieval facilitated by the **`yfinance`** library.
-*   Built with the awesome **Streamlit** framework.
+- Data from **Yahoo Finance**, retrieved via the **`yfinance`** library.
+- Built with **Streamlit**, **pandas**, **matplotlib**, and **seaborn**.
